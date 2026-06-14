@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stumpo - Stumping Timer</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Inter,sans-serif;
+}
+
+body{
+background:#0b1220;
+color:white;
+min-height:100vh;
+}
+
+.container{
+max-width:1400px;
+margin:auto;
+padding:20px;
+}
+
+.header{
+text-align:center;
+margin-bottom:20px;
+}
+
+.logo{
+font-size:3rem;
+font-weight:800;
+color:#39ff14;
+}
+
+.subtitle{
+color:#aaa;
+}
+
+.card{
+background:#111827;
+border:1px solid #1f2937;
+border-radius:20px;
+padding:20px;
+margin-bottom:20px;
+}
+
+input[type=file]{
+width:100%;
+padding:15px;
+border-radius:10px;
+background:#1f2937;
+color:white;
+}
+
+.video-wrapper{
+position:relative;
+overflow:auto;
+background:black;
+border-radius:15px;
+}
+
+video{
+width:100%;
+display:block;
+transform-origin:center center;
+}
+
+.controls{
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+margin-top:15px;
+}
+
+button{
+background:#39ff14;
+color:black;
+border:none;
+padding:12px 18px;
+border-radius:10px;
+cursor:pointer;
+font-weight:bold;
+}
+
+button:hover{
+opacity:.9;
+}
+
+.info-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:15px;
+}
+
+.info-box{
+background:#0f172a;
+padding:15px;
+border-radius:15px;
+}
+
+.label{
+color:#999;
+font-size:14px;
+}
+
+.value{
+font-size:26px;
+font-weight:bold;
+margin-top:5px;
+}
+
+.result{
+text-align:center;
+padding:25px;
+}
+
+.result h2{
+color:#39ff14;
+margin-bottom:15px;
+}
+
+.big{
+font-size:3rem;
+font-weight:900;
+}
+
+.timeline{
+width:100%;
+}
+
+.shortcuts{
+color:#999;
+line-height:1.8;
+}
+
+@media(max-width:768px){
+.logo{
+font-size:2rem;
+}
+
+.big{
+font-size:2rem;
+}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+<div class="logo">🏏 STUMPO</div>
+<div class="subtitle">
+Professional Stumping Timing Calculator
+</div>
+</div>
+
+<div class="card">
+<input type="file" id="videoUpload" accept="video/*">
+</div>
+
+<div class="card">
+<div class="video-wrapper">
+<video id="video" controls></video>
+</div>
+
+<div class="controls">
+<button onclick="prevFrame()">◀ Frame</button>
+<button onclick="nextFrame()">Frame ▶</button>
+<button onclick="setCollection()">Mark Collection</button>
+<button onclick="setStumps()">Mark Stumps</button>
+<button onclick="zoomIn()">+ Zoom</button>
+<button onclick="zoomOut()">- Zoom</button>
+</div>
+
+<br>
+
+<input
+type="range"
+class="timeline"
+id="timeline"
+min="0"
+max="100"
+value="0">
+</div>
+
+<div class="info-grid">
+
+<div class="info-box">
+<div class="label">Current Time</div>
+<div class="value" id="currentTime">0.000</div>
+</div>
+
+<div class="info-box">
+<div class="label">Collection Time</div>
+<div class="value" id="collectionTime">-</div>
+</div>
+
+<div class="info-box">
+<div class="label">Stumps Time</div>
+<div class="value" id="stumpsTime">-</div>
+</div>
+
+<div class="info-box">
+<div class="label">Estimated FPS</div>
+<div class="value" id="fps">30</div>
+</div>
+
+</div>
+
+<div class="card result">
+
+<h2>STUMPING TIME</h2>
+
+<div class="big" id="result">
+0.000 s
+</div>
+
+<br>
+
+<div id="ms">
+0 ms
+</div>
+
+</div>
+
+<div class="card">
+<h3>Keyboard Shortcuts</h3>
+<br>
+<div class="shortcuts">
+← Previous Frame<br>
+→ Next Frame<br>
+C Mark Collection<br>
+S Mark Stumps<br>
++ Zoom In<br>
+- Zoom Out
+</div>
+</div>
+
+</div>
+
+<script>
+
+const video = document.getElementById('video');
+const upload = document.getElementById('videoUpload');
+const timeline = document.getElementById('timeline');
+
+let collection = null;
+let stumps = null;
+
+let fps = 30;
+let frameStep = 1/fps;
+
+let zoom = 1;
+
+upload.addEventListener('change', e=>{
+const file = e.target.files[0];
+
+if(file){
+video.src = URL.createObjectURL(file);
+}
+});
+
+video.addEventListener('loadedmetadata', ()=>{
+timeline.max = video.duration;
+});
+
+video.addEventListener('timeupdate', ()=>{
+timeline.value = video.currentTime;
+
+document.getElementById('currentTime').innerText =
+video.currentTime.toFixed(3);
+});
+
+timeline.addEventListener('input', ()=>{
+video.currentTime = timeline.value;
+});
+
+function prevFrame(){
+video.pause();
+video.currentTime =
+Math.max(0, video.currentTime - frameStep);
+}
+
+function nextFrame(){
+video.pause();
+video.currentTime =
+Math.min(video.duration,
+video.currentTime + frameStep);
+}
+
+function setCollection(){
+collection = video.currentTime;
+
+document.getElementById('collectionTime').innerText =
+collection.toFixed(3);
+
+calculate();
+}
+
+function setStumps(){
+stumps = video.currentTime;
+
+document.getElementById('stumpsTime').innerText =
+stumps.toFixed(3);
+
+calculate();
+}
+
+function calculate(){
+
+if(collection!==null && stumps!==null){
+
+let diff = Math.abs(stumps - collection);
+
+document.getElementById('result').innerText =
+diff.toFixed(3) + " s";
+
+document.getElementById('ms').innerText =
+(diff*1000).toFixed(0) + " ms";
+}
+}
+
+function zoomIn(){
+zoom += 0.25;
+video.style.transform =
+`scale(${zoom})`;
+}
+
+function zoomOut(){
+zoom = Math.max(1, zoom - 0.25);
+video.style.transform =
+`scale(${zoom})`;
+}
+
+document.addEventListener('keydown', e=>{
+
+if(e.key==="ArrowLeft"){
+prevFrame();
+}
+
+if(e.key==="ArrowRight"){
+nextFrame();
+}
+
+if(e.key==="c" || e.key==="C"){
+setCollection();
+}
+
+if(e.key==="s" || e.key==="S"){
+setStumps();
+}
+
+if(e.key==="+"){
+zoomIn();
+}
+
+if(e.key==="-" ){
+zoomOut();
+}
+
+});
+
+</script>
+
+</body>
+</html>
