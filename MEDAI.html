@@ -1,1369 +1,1574 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-  <title>MedAI • Universal Medicine Guide (Offline)</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    body {
-      background: linear-gradient(145deg, #f0f7ff 0%, #e6f0fa 100%);
-      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', system-ui, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-      margin: 0;
-    }
+<title>MediFind — Medicine Search</title>
 
-    .glass-card {
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-radius: 3rem;
-      box-shadow: 0 30px 60px rgba(0, 20, 40, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.7);
-      width: 100%;
-      max-width: 750px;
-      padding: 2.5rem 2rem;
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      transition: all 0.3s ease;
-    }
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-    .header {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      margin-bottom: 2rem;
-    }
+body {
+    min-height: 100vh;
+    font-family: Inter, Arial, sans-serif;
+    color: #f5f7fb;
+    background:
+        radial-gradient(circle at 10% 10%, #173b68 0, transparent 35%),
+        radial-gradient(circle at 90% 15%, #301c68 0, transparent 35%),
+        #050a13;
+}
 
-    .logo-icon {
-      background: #0b5e7c;
-      background: linear-gradient(135deg, #0a4860, #13829b);
-      width: 3.4rem;
-      height: 3.4rem;
-      border-radius: 1.2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 12px 20px -10px rgba(19, 130, 155, 0.5);
-      color: white;
-      font-size: 1.8rem;
-    }
+/* NAV */
 
-    .title h1 {
-      font-size: 2.1rem;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      color: #0a2f3c;
-      line-height: 1.2;
-    }
+nav {
+    width: min(1150px, calc(100% - 32px));
+    height: 80px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 
-    .title .sub {
-      font-size: 0.9rem;
-      color: #2c5f73;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-    }
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 21px;
+    font-weight: 800;
+}
 
-    .search-section {
-      margin: 1.8rem 0 1.5rem;
-    }
+.logoIcon {
+    width: 43px;
+    height: 43px;
+    border-radius: 13px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, #4da3ff, #785cff);
+    box-shadow: 0 10px 35px rgba(77,163,255,.3);
+}
 
-    .input-group {
-      display: flex;
-      background: white;
-      border-radius: 3rem;
-      padding: 0.3rem;
-      box-shadow: 0 8px 22px rgba(0,0,0,0.08);
-      border: 1px solid rgba(19, 130, 155, 0.25);
-      background: rgba(255,255,255,0.9);
-    }
+.badge {
+    padding: 8px 14px;
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,.1);
+    color: #91a6bf;
+    background: rgba(255,255,255,.035);
+    font-size: 12px;
+}
 
-    .input-group input {
-      flex: 1;
-      border: none;
-      padding: 1rem 1.4rem;
-      font-size: 1.05rem;
-      background: transparent;
-      outline: none;
-      border-radius: 3rem;
-      font-weight: 500;
-      color: #0b3b4a;
-    }
+/* HERO */
 
-    .input-group input::placeholder {
-      color: #7a9ca8;
-      font-weight: 400;
-      font-style: italic;
-    }
+main {
+    width: min(1000px, calc(100% - 32px));
+    margin: auto;
+}
 
-    .input-group button {
-      background: #0b5e7c;
-      background: linear-gradient(135deg, #0c4f68, #1b8ca3);
-      border: none;
-      color: white;
-      font-weight: 600;
-      padding: 0 2rem;
-      border-radius: 2.5rem;
-      font-size: 1rem;
-      letter-spacing: 0.4px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      transition: all 0.25s;
-      box-shadow: 0 6px 16px rgba(12, 79, 104, 0.45);
-      border: 1px solid rgba(255,255,255,0.2);
-    }
+.hero {
+    text-align: center;
+    padding: 85px 0 45px;
+}
 
-    .input-group button:hover {
-      background: linear-gradient(135deg, #0e5d78, #1fa1ba);
-      box-shadow: 0 10px 18px rgba(10, 90, 110, 0.5);
-      transform: scale(1.02);
-    }
+.tag {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 50px;
+    border: 1px solid rgba(75,163,255,.25);
+    color: #91c6ff;
+    background: rgba(75,163,255,.07);
+    font-size: 12px;
+    font-weight: 800;
+    margin-bottom: 22px;
+}
 
-    .status-badge {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin: 0.5rem 0.3rem 1.8rem;
-      flex-wrap: wrap;
-    }
+h1 {
+    font-size: clamp(42px, 7vw, 73px);
+    line-height: .98;
+    letter-spacing: -4px;
+}
 
-    .api-indicator {
-      font-size: 0.8rem;
-      background: #e0f0f5;
-      padding: 0.3rem 1rem;
-      border-radius: 2rem;
-      color: #0a4b5c;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
+h1 span {
+    background: linear-gradient(100deg, white, #70b4ff, #a083ff);
+    -webkit-background-clip: text;
+    color: transparent;
+}
 
-    .clear-btn {
-      background: none;
-      border: none;
-      color: #0f5b6b;
-      font-weight: 500;
-      cursor: pointer;
-      font-size: 0.85rem;
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-      padding: 0.3rem 0.8rem;
-      border-radius: 2rem;
-      transition: 0.2s;
-    }
+.hero p {
+    max-width: 680px;
+    margin: 24px auto 34px;
+    color: #8da1ba;
+    line-height: 1.7;
+}
 
-    .clear-btn:hover {
-      background: rgba(15, 91, 107, 0.1);
-    }
+/* SEARCH */
 
-    .result-card {
-      background: white;
-      border-radius: 2rem;
-      padding: 1.8rem;
-      background: rgba(255,255,255,0.8);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      box-shadow: 0 18px 35px rgba(0, 32, 48, 0.15);
-      border: 1px solid rgba(255,255,255,0.8);
-      transition: 0.3s;
-    }
+.search {
+    max-width: 780px;
+    margin: auto;
+    display: flex;
+    padding: 7px;
+    border-radius: 19px;
+    background: rgba(8,16,29,.85);
+    border: 1px solid rgba(255,255,255,.12);
+    box-shadow: 0 25px 70px rgba(0,0,0,.4);
+}
 
-    .medicine-header {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      margin-bottom: 1.3rem;
-      flex-wrap: wrap;
-    }
+.search input {
+    flex: 1;
+    min-width: 0;
+    padding: 17px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: white;
+    font-size: 16px;
+}
 
-    .medicine-name {
-      font-size: 1.9rem;
-      font-weight: 700;
-      color: #04323f;
-      text-transform: capitalize;
-      letter-spacing: -0.3px;
+.search input::placeholder {
+    color: #62758c;
+}
+
+.search button {
+    border: none;
+    border-radius: 13px;
+    padding: 0 25px;
+    color: white;
+    background: linear-gradient(135deg, #4da3ff, #795cff);
+    font-weight: 800;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.search button:hover {
+    transform: translateY(-2px);
+}
+
+.search button:disabled {
+    opacity: .5;
+    cursor: wait;
+}
+
+.examples {
+    margin-top: 14px;
+    color: #61748c;
+    font-size: 12px;
+}
+
+.examples span {
+    margin-left: 8px;
+    color: #91afd0;
+    cursor: pointer;
+}
+
+/* SUGGESTION */
+
+#suggestion {
+    display: none;
+    max-width: 780px;
+    margin: 18px auto 0;
+    padding: 14px 18px;
+    border-radius: 13px;
+    background: rgba(77,163,255,.06);
+    border: 1px solid rgba(77,163,255,.18);
+    color: #9fc8f5;
+    font-size: 13px;
+}
+
+#suggestion strong {
+    color: white;
+    cursor: pointer;
+}
+
+/* LOADING */
+
+#loading {
+    display: none;
+    text-align: center;
+    padding: 40px;
+    color: #8296ad;
+}
+
+.spinner {
+    width: 42px;
+    height: 42px;
+    margin: auto auto 15px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,.1);
+    border-top-color: #5da9ff;
+    animation: spin .8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ERROR */
+
+#error {
+    display: none;
+    max-width: 780px;
+    margin: 20px auto;
+    padding: 17px;
+    border-radius: 14px;
+    color: #ffabb8;
+    background: rgba(255,70,100,.07);
+    border: 1px solid rgba(255,70,100,.2);
+}
+
+/* RESULTS */
+
+#result {
+    display: none;
+    padding: 30px 0 80px;
+}
+
+.card {
+    overflow: hidden;
+    border-radius: 25px;
+    background: rgba(14,27,45,.8);
+    border: 1px solid rgba(255,255,255,.1);
+    box-shadow: 0 25px 80px rgba(0,0,0,.3);
+}
+
+.header {
+    padding: 32px;
+    border-bottom: 1px solid rgba(255,255,255,.07);
+}
+
+.small {
+    color: #5da9ff;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+#medicineName {
+    font-size: 43px;
+    letter-spacing: -1.5px;
+}
+
+#genericName {
+    margin-top: 8px;
+    color: #8397af;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.box {
+    padding: 35px;
+    min-height: 235px;
+}
+
+.box:first-child {
+    border-right: 1px solid rgba(255,255,255,.07);
+}
+
+.boxTitle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    font-weight: 800;
+}
+
+.icon {
+    width: 37px;
+    height: 37px;
+    display: grid;
+    place-items: center;
+    border-radius: 11px;
+    background: rgba(77,163,255,.1);
+}
+
+.content {
+    color: #aebccc;
+    font-size: 14px;
+    line-height: 1.8;
+    white-space: pre-line;
+}
+
+.price {
+    font-size: 38px;
+    font-weight: 900;
+    color: #62dda2;
+}
+
+.priceNote {
+    margin-top: 8px;
+    color: #687d95;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.disclaimer {
+    margin-top: 18px;
+    padding: 17px;
+    border-radius: 15px;
+    background: rgba(255,205,100,.04);
+    border: 1px solid rgba(255,205,100,.12);
+    color: #9e9175;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/* FOOTER */
+
+footer {
+    margin-top: 40px;
+    padding: 28px 15px;
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,.07);
+    color: #657991;
+    font-size: 12px;
+}
+
+footer strong {
+    color: #afbed0;
+}
+
+.footerSub {
+    margin-top: 7px;
+    color: #465970;
+}
+
+/* MOBILE */
+
+@media(max-width:700px) {
+
+    nav {
+        height: 65px;
     }
 
     .badge {
-      background: #1b8ca3;
-      color: white;
-      border-radius: 2rem;
-      padding: 0.25rem 1.2rem;
-      font-size: 0.8rem;
-      font-weight: 600;
-      background: #0c6379;
+        display: none;
     }
 
-    .symptoms-box {
-      background: #f3f9ff;
-      border-radius: 1.4rem;
-      padding: 1.4rem;
-      margin: 1rem 0 0.8rem;
-      border-left: 5px solid #0f6b82;
+    .hero {
+        padding: 60px 0 35px;
     }
 
-    .symptoms-label {
-      font-weight: 700;
-      color: #062c38;
-      font-size: 1rem;
-      margin-bottom: 0.7rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+    h1 {
+        letter-spacing: -2px;
     }
 
-    .disease-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.65rem;
-      margin-top: 0.5rem;
+    .search button {
+        padding: 0 17px;
     }
 
-    .disease-tag {
-      background: white;
-      padding: 0.5rem 1.2rem;
-      border-radius: 2rem;
-      font-weight: 600;
-      color: #0a3f4c;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.04);
-      border: 1px solid #cde3ec;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
+    .grid {
+        grid-template-columns: 1fr;
     }
 
-    .info-text {
-      color: #2c5364;
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
+    .box:first-child {
+        border-right: none;
+        border-bottom: 1px solid rgba(255,255,255,.07);
     }
 
-    .loader {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      color: #0b5b6e;
-      font-weight: 500;
-      padding: 1rem 0;
+    .header,
+    .box {
+        padding: 25px;
     }
 
-    .error-message {
-      color: #b13b3b;
-      background: #ffe9e9;
-      padding: 0.9rem 1.2rem;
-      border-radius: 1.5rem;
-      font-weight: 500;
+    #medicineName {
+        font-size: 32px;
     }
-
-    .hidden {
-      display: none;
-    }
-
-    @media (max-width: 500px) {
-      .glass-card {
-        padding: 1.8rem 1.2rem;
-      }
-      .input-group button {
-        padding: 0 1.2rem;
-      }
-    }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a0a0a, #1a1a2e, #16213e);
-            color: white;
-            min-height: 100vh;
-        }
-
-        /* Navigation */
-        nav {
-            background: rgba(0, 0, 0, 0.9);
-            padding: 1rem 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-            border-bottom: 2px solid #e94560;
-        }
-
-        .logo {
-            font-size: 2.5rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, #e94560, #ff6b6b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: 3px;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            margin-left: 2rem;
-            font-size: 1.1rem;
-            transition: color 0.3s;
-            font-weight: 500;
-        }
-
-        .nav-links a:hover {
-            color: #e94560;
-        }
-
-        /* Hero Section with Poster */
-        .hero {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 4rem 5%;
-            background: linear-gradient(135deg, #0a0a0a, #1a1a2e);
-            min-height: 90vh;
-            gap: 3rem;
-            flex-wrap: wrap;
-        }
-
-        .hero-content {
-            flex: 1;
-            min-width: 300px;
-        }
-
-        .hero-content h1 {
-            font-size: 4.5rem;
-            margin-bottom: 1rem;
-            animation: glow 2s ease-in-out infinite alternate;
-            background: linear-gradient(45deg, #e94560, #ff6b6b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        @keyframes glow {
-            from { text-shadow: 0 0 10px #e94560, 0 0 20px #e94560, 0 0 30px #e94560; }
-            to { text-shadow: 0 0 20px #ff6b6b, 0 0 40px #ff6b6b, 0 0 60px #ff6b6b; }
-        }
-
-        .hero-content .tagline {
-            font-size: 1.3rem;
-            color: #ccc;
-            margin-bottom: 0.5rem;
-            font-style: italic;
-        }
-
-        .hero-content .description {
-            font-size: 1.1rem;
-            color: #aaa;
-            margin-bottom: 2rem;
-            line-height: 1.6;
-        }
-
-        .poster-container {
-            flex: 1;
-            min-width: 300px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .poster {
-            width: 100%;
-            max-width: 400px;
-            position: relative;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(233, 69, 96, 0.3);
-            border: 3px solid #e94560;
-            transition: transform 0.3s, box-shadow 0.3s;
-            background: #1a1a2e;
-        }
-
-        .poster:hover {
-            transform: scale(1.02);
-            box-shadow: 0 30px 80px rgba(233, 69, 96, 0.5);
-        }
-
-        .poster img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        .poster-placeholder {
-            width: 100%;
-            aspect-ratio: 2/3;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            color: #e94560;
-            text-align: center;
-            padding: 2rem;
-        }
-
-        .poster-placeholder .poster-title {
-            font-size: 3rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-        }
-
-        .poster-placeholder .poster-subtitle {
-            font-size: 1.2rem;
-            color: #ff6b6b;
-            margin-bottom: 2rem;
-        }
-
-        .poster-placeholder .poster-icon {
-            font-size: 5rem;
-            margin-bottom: 1rem;
-        }
-
-        .poster-badge {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: #e94560;
-            color: white;
-            padding: 0.5rem 1.5rem;
-            border-radius: 25px;
-            font-weight: bold;
-            font-size: 0.9rem;
-            z-index: 10;
-        }
-
-        .btn {
-            padding: 1rem 2.5rem;
-            background: linear-gradient(45deg, #e94560, #ff6b6b);
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            transition: transform 0.3s, box-shadow 0.3s;
-            display: inline-block;
-            margin-right: 1rem;
-            margin-top: 0.5rem;
-        }
-
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 2px solid #e94560;
-            color: #e94560;
-        }
-
-        .btn-outline:hover {
-            background: #e94560;
-        }
-
-        /* Live Subscriber Counter */
-        .live-counter-section {
-            padding: 2rem 5%;
-            background: #0a0a0a;
-            text-align: center;
-            border-top: 2px solid #e94560;
-            border-bottom: 2px solid #e94560;
-        }
-
-        .counter-container {
-            display: inline-block;
-            background: rgba(233, 69, 96, 0.1);
-            padding: 1.5rem 3rem;
-            border-radius: 15px;
-            border: 1px solid rgba(233, 69, 96, 0.3);
-        }
-
-        .live-badge {
-            display: inline-block;
-            background: #ff0000;
-            color: white;
-            padding: 0.3rem 0.8rem;
-            border-radius: 5px;
-            font-size: 0.9rem;
-            animation: pulse 2s infinite;
-            margin-right: 1rem;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-
-        .subscriber-count {
-            font-size: 3rem;
-            font-weight: bold;
-            color: #e94560;
-            margin-top: 0.5rem;
-        }
-
-        .channel-name {
-            font-size: 1.2rem;
-            color: #ccc;
-        }
-
-        /* Cast Section */
-        .cast-section {
-            padding: 5rem 5%;
-            background: #0f0f1a;
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 3rem;
-            color: #e94560;
-            position: relative;
-        }
-
-        .section-title::after {
-            content: '';
-            display: block;
-            width: 100px;
-            height: 3px;
-            background: #e94560;
-            margin: 1rem auto;
-        }
-
-        .cast-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .cast-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            overflow: hidden;
-            transition: transform 0.3s;
-            border: 1px solid rgba(233, 69, 96, 0.2);
-        }
-
-        .cast-card:hover {
-            transform: translateY(-10px);
-            border-color: #e94560;
-        }
-
-        .cast-img {
-            width: 100%;
-            height: 250px;
-            background: #1a1a2e;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            color: #e94560;
-            position: relative;
-        }
-
-        .cast-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .cast-info {
-            padding: 1.5rem;
-        }
-
-        .cast-info h3 {
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-            color: #e94560;
-        }
-
-        .cast-info .character {
-            color: #ff6b6b;
-            font-style: italic;
-            margin-bottom: 0.3rem;
-            font-size: 0.95rem;
-        }
-
-        .cast-info .real-name {
-            color: #aaa;
-            font-size: 0.85rem;
-        }
-
-        /* Trailer Section */
-        .trailer-section {
-            padding: 5rem 5%;
-            text-align: center;
-            background: linear-gradient(135deg, #1a1a2e, #0f0f1a);
-        }
-
-        .trailer-container {
-            max-width: 900px;
-            margin: 0 auto;
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-        }
-
-        .trailer-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border-radius: 15px;
-            border: 2px solid #e94560;
-        }
-
-        /* Gallery Section */
-        .gallery-section {
-            padding: 5rem 5%;
-            background: #0f0f1a;
-        }
-
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .gallery-item {
-            border-radius: 15px;
-            overflow: hidden;
-            border: 2px solid rgba(233, 69, 96, 0.2);
-            transition: transform 0.3s;
-            aspect-ratio: 16/9;
-            background: #1a1a2e;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .gallery-item:hover {
-            transform: scale(1.05);
-            border-color: #e94560;
-        }
-
-        .gallery-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* Channel Section */
-        .channel-section {
-            padding: 5rem 5%;
-            background: #0f0f1a;
-            text-align: center;
-        }
-
-        .channel-card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 3rem;
-            border-radius: 20px;
-            max-width: 600px;
-            margin: 0 auto;
-            border: 1px solid rgba(233, 69, 96, 0.3);
-        }
-
-        .channel-card img {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            margin-bottom: 1rem;
-            border: 3px solid #e94560;
-            background: #1a1a2e;
-        }
-
-        .channel-stats {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 2rem;
-        }
-
-        .stat {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #e94560;
-        }
-
-        /* Episodes Section */
-        .episodes-section {
-            padding: 5rem 5%;
-            background: #0f0f1a;
-        }
-
-        .episode-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .episode-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            overflow: hidden;
-            border: 1px solid rgba(233, 69, 96, 0.2);
-            transition: transform 0.3s;
-        }
-
-        .episode-card:hover {
-            transform: scale(1.05);
-            border-color: #e94560;
-        }
-
-        .episode-thumb {
-            width: 100%;
-            height: 200px;
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .play-btn {
-            background: #e94560;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            transition: transform 0.3s;
-        }
-
-        .episode-card:hover .play-btn {
-            transform: scale(1.1);
-        }
-
-        .episode-number {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: #e94560;
-            color: white;
-            padding: 0.3rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: bold;
-        }
-
-        .episode-duration {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 0.2rem 0.8rem;
-            border-radius: 5px;
-            font-size: 0.8rem;
-        }
-
-        .episode-info {
-            padding: 1.5rem;
-        }
-
-        .episode-info h3 {
-            color: #e94560;
-            margin-bottom: 0.5rem;
-            font-size: 1.1rem;
-        }
-
-        .episode-info p {
-            color: #aaa;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        .watch-btn {
-            padding: 0.5rem 1.5rem;
-            background: transparent;
-            border: 2px solid #e94560;
-            color: #e94560;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 0.9rem;
-        }
-
-        .watch-btn:hover {
-            background: #e94560;
-            color: white;
-        }
-
-        /* Footer */
-        footer {
-            background: #000;
-            text-align: center;
-            padding: 2rem;
-            position: relative;
-        }
-
-        .social-links {
-            margin-bottom: 1rem;
-        }
-
-        .social-links a {
-            color: white;
-            font-size: 1.5rem;
-            margin: 0 1rem;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .social-links a:hover {
-            color: #e94560;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .hero {
-                flex-direction: column;
-                text-align: center;
-                padding: 2rem 1rem;
-            }
-
-            .hero-content h1 {
-                font-size: 2.5rem;
-            }
-            
-            .nav-links {
-                display: none;
-            }
-            
-            .cast-grid, .gallery-grid, .episode-grid {
-                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            }
-
-            .poster {
-                max-width: 280px;
-                margin: 0 auto;
-            }
-        }
-    </style>
+}
+</style>
 </head>
+
+
 <body>
-    <nav>
-        <div class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="Ekaki.html">EKAKI</a>
-            <a href="index.html">ADM SMP</a>
-        </div>
-    </nav>    
 
-  
-  <div class="glass-card">
-    <div class="header">
-      <div class="logo-icon">
-        <i class="fas fa-capsules"></i>
-        
-      </div>
-      <div class="title">
-        <h1>MedAI</h1>
-        <div class="sub">
-          <i class="fas fa-globe"></i> Offline · 250+ medicines
+<nav>
+
+    <div class="logo">
+
+        <div class="logoIcon">
+            ⚕
         </div>
-      </div>
+
+        MediFind
+
     </div>
 
-    <div class="search-section">
-      <div class="input-group">
-        <input type="text" id="medicineInput" placeholder="e.g. Metformin, Aspirin, Ibuprofen..." autocomplete="off" />
-        <button id="searchBtn">
-          <i class="fas fa-search"></i> Search
+    <div class="badge">
+        Medicine Information
+    </div>
+
+</nav>
+
+
+<main>
+
+<section class="hero">
+
+    <div class="tag">
+        🔎 SMART MEDICINE SEARCH
+    </div>
+
+    <h1>
+        Find what your <span>medicine is for.</span>
+    </h1>
+
+    <p>
+        Search by medicine or brand name. MediFind can handle
+        common spelling mistakes and identify the medicine's
+        common uses.
+    </p>
+
+
+    <div class="search">
+
+        <input
+            id="medicineInput"
+            type="text"
+            placeholder="Try Dolo, dollo, paracetamol..."
+            autocomplete="off"
+            onkeydown="handleEnter(event)"
+        >
+
+        <button id="searchButton" onclick="searchMedicine()">
+            Search
         </button>
-      </div>
-      <div class="status-badge">
-        <div class="api-indicator">
-          <i class="fas fa-database"></i> <span id="apiSourceText">Local database · 250+ entries</span>
-        <a href="Ekaki.html"><button style="background: blue; color: orange;">Ekaki Page</button></a>
+
+    </div>
+
+
+    <div class="examples">
+
+        Try:
+
+        <span onclick="quickSearch('Dolo')">
+            Dolo
+        </span>
+
+        <span onclick="quickSearch('Paracetamol')">
+            Paracetamol
+        </span>
+
+        <span onclick="quickSearch('Ibuprofen')">
+            Ibuprofen
+        </span>
+
+        <span onclick="quickSearch('Amoxicillin')">
+            Amoxicillin
+        </span>
+
+    </div>
+
+
+    <div id="suggestion"></div>
+
+</section>
+
+
+<div id="loading">
+
+    <div class="spinner"></div>
+
+    Searching medical databases...
+
+</div>
+
+
+<div id="error"></div>
+
+
+<section id="result">
+
+    <div class="card">
+
+        <div class="header">
+
+            <div class="small">
+                Medicine Found
+            </div>
+
+            <div id="medicineName">
+                —
+            </div>
+
+            <div id="genericName">
+                —
+            </div>
+
         </div>
-        <button id="clearResultBtn" class="clear-btn">
-          <i class="fas fa-eraser"></i> Clear
-        </button>
-      </div>
+
+
+        <div class="grid">
+
+            <div class="box">
+
+                <div class="boxTitle">
+
+                    <div class="icon">
+                        💊
+                    </div>
+
+                    Commonly Taken For
+
+                </div>
+
+
+                <div
+                    id="uses"
+                    class="content">
+                </div>
+
+            </div>
+
+
+            <div class="box">
+
+                <div class="boxTitle">
+
+                    <div class="icon">
+                        ₹
+                    </div>
+
+                    Average Price
+
+                </div>
+
+
+                <div
+                    id="price"
+                    class="price">
+                    —
+                </div>
+
+
+                <div
+                    id="priceNote"
+                    class="priceNote">
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <!-- Result area -->
-    <div id="resultContainer" class="result-card hidden">
-      <div id="dynamicContent"></div>
+
+    <div class="disclaimer">
+
+        ⚠️ <strong>Important:</strong>
+        This information is for educational purposes only.
+        A medicine may have different uses depending on the
+        patient and medical situation. Do not take or change
+        medication based only on this website. Consult a
+        doctor or pharmacist.
+
     </div>
 
-    <!-- Initial placeholder / welcome -->
-    <div id="welcomeMessage" class="result-card" style="text-align: center; padding: 2.2rem;">
-      <i class="fas fa-stethoscope" style="font-size: 2.4rem; color: #0f6b82; opacity: 0.7;"></i>
-      <p style="margin-top: 1rem; font-weight: 500; color: #174c5c;">Search any medicine name to discover its indications & diseases.</p>
-      <p style="font-size: 0.85rem; color: #2f6576;">Built-in database with 250+ medicines. Easy to expand.</p>
+</section>
+
+</main>
+
+
+<footer>
+
+    Database Created by :
+    <strong>Aviral Pandey</strong>
+
+    <div class="footerSub">
+        MediFind • Public medical information
     </div>
-  </div>
 
-  <script>
-    (function() {
-      // --------------------------------------------------------------
-      // MEDICINE DATABASE (200+ entries)
-      // FORMAT: "MedicineName | Disease/Symptom1, Disease/Symptom2, ..."
-      // You can easily add new lines by following this pattern.
-      // No limit – just copy the pattern and insert a new line.
-      // --------------------------------------------------------------
-      const medicineDB = `
-Metformin | Type 2 Diabetes, Polycystic Ovary Syndrome, Insulin Resistance
-Aspirin | Pain, Fever, Inflammation, Heart Attack Prevention, Stroke Prevention
-Ibuprofen | Pain, Inflammation, Fever, Arthritis, Menstrual Cramps
-Paracetamol | Fever, Mild Pain, Headache
-Amoxicillin | Bacterial Infections, Ear Infection, Strep Throat, Pneumonia
-Omeprazole | GERD, Stomach Ulcer, Heartburn, Acid Reflux
-Lisinopril | High Blood Pressure, Heart Failure, Kidney Protection in Diabetes
-Atorvastatin | High Cholesterol, Cardiovascular Disease Prevention
-Levothyroxine | Hypothyroidism, Thyroid Hormone Replacement
-Metoprolol | High Blood Pressure, Angina, Heart Failure, Migraine Prevention
-Simvastatin | High Cholesterol, Reduce Cardiovascular Risk
-Losartan | High Blood Pressure, Kidney Protection in Diabetes, Stroke Risk Reduction
-Albuterol | Asthma, Bronchospasm, COPD
-Gabapentin | Nerve Pain, Seizures, Restless Legs Syndrome
-Sertraline | Depression, Anxiety, OCD, PTSD
-Amlodipine | High Blood Pressure, Coronary Artery Disease
-Hydrochlorothiazide | High Blood Pressure, Edema, Fluid Retention
-Furosemide | Edema, Heart Failure, High Blood Pressure
-Ciprofloxacin | Urinary Tract Infection, Bacterial Infections, Anthrax
-Azithromycin | Respiratory Infections, Ear Infections, Chlamydia
-Doxycycline | Acne, Lyme Disease, Malaria Prevention, Bacterial Infections
-Prednisone | Inflammation, Allergic Reactions, Asthma, Autoimmune Diseases
-Tramadol | Moderate to Severe Pain
-Trazodone | Depression, Insomnia
-Fluoxetine | Depression, Anxiety, OCD, Bulimia
-Citalopram | Depression, Anxiety
-Escitalopram | Depression, Generalized Anxiety Disorder
-Warfarin | Blood Clot Prevention, Atrial Fibrillation, Deep Vein Thrombosis
-Clopidogrel | Stroke Prevention, Heart Attack Prevention, Blood Clots
-Insulin Glargine | Type 1 Diabetes, Type 2 Diabetes
-Insulin Lispro | Diabetes Type 1 & 2, Blood Sugar Control
-Metronidazole | Bacterial Vaginosis, Rosacea, Dental Infections, Trichomoniasis
-Cetirizine | Allergies, Hay Fever, Hives
-Loratadine | Seasonal Allergies, Chronic Urticaria
-Montelukast | Asthma, Allergic Rhinitis
-Ranitidine | Heartburn, GERD, Stomach Ulcer (historical)
-Ondansetron | Nausea, Vomiting, Chemotherapy-Induced Nausea
-Venlafaxine | Depression, Generalized Anxiety, Panic Disorder
-Duloxetine | Depression, Fibromyalgia, Diabetic Neuropathy
-Pregabalin | Neuropathic Pain, Fibromyalgia, Seizures
-Alprazolam | Anxiety, Panic Disorder
-Lorazepam | Anxiety, Insomnia, Seizures
-Diazepam | Anxiety, Muscle Spasm, Alcohol Withdrawal
-Zolpidem | Insomnia
-Baclofen | Muscle Spasticity, Multiple Sclerosis
-Tamsulosin | Benign Prostatic Hyperplasia, Kidney Stones
-Finasteride | Hair Loss, Enlarged Prostate
-Sildenafil | Erectile Dysfunction, Pulmonary Arterial Hypertension
-Tadalafil | Erectile Dysfunction, Benign Prostatic Hyperplasia
-Spironolactone | High Blood Pressure, Heart Failure, Acne
-Hydroxychloroquine | Malaria, Rheumatoid Arthritis, Lupus
-Methotrexate | Rheumatoid Arthritis, Psoriasis, Cancer
-Adalimumab | Rheumatoid Arthritis, Crohn's Disease, Psoriasis
-Etanercept | Rheumatoid Arthritis, Ankylosing Spondylitis, Psoriasis
-Infliximab | Crohn's Disease, Ulcerative Colitis, Rheumatoid Arthritis
-Ranibizumab | Macular Degeneration, Diabetic Retinopathy
-Bevacizumab | Colorectal Cancer, Lung Cancer, Glioblastoma
-Trastuzumab | Breast Cancer, Gastric Cancer
-Rituximab | Lymphoma, Leukemia, Rheumatoid Arthritis
-Imatinib | Chronic Myeloid Leukemia, GIST
-Erlotinib | Non-Small Cell Lung Cancer, Pancreatic Cancer
-Capecitabine | Colorectal Cancer, Breast Cancer
-Letrozole | Breast Cancer, Ovulation Induction
-Tamoxifen | Breast Cancer, Infertility
-Clomiphene | Infertility, Ovulation Induction
-Metoclopramide | Nausea, Gastroparesis, Migraine, Vomiting
-Prochlorperazine | Nausea, Vertigo, Schizophrenia
-Haloperidol | Schizophrenia, Tourette Syndrome
-Risperidone | Schizophrenia, Bipolar Disorder, Autism Irritability
-Quetiapine | Schizophrenia, Bipolar Disorder, Depression
-Aripiprazole | Schizophrenia, Bipolar, Depression
-Olanzapine | Schizophrenia, Bipolar I Disorder
-Lamotrigine | Epilepsy, Bipolar Disorder
-Valproate | Seizures, Bipolar Disorder, Migraine
-Carbamazepine | Epilepsy, Trigeminal Neuralgia, Bipolar
-Phenytoin | Epilepsy, Seizures
-Levetiracetam | Epilepsy, Partial Onset Seizures
-Topiramate | Epilepsy, Migraine Prevention
-Sumatriptan | Migraine, Cluster Headache
-Rizatriptan | Migraine
-Eletriptan | Migraine
-Propranolol | High Blood Pressure, Migraine Prevention, Performance Anxiety
-Atenolol | High Blood Pressure, Angina
-Verapamil | High Blood Pressure, Angina, Arrhythmia
-Diltiazem | High Blood Pressure, Angina, Atrial Fibrillation
-Digoxin | Heart Failure, Atrial Fibrillation
-Amiodarone | Ventricular Tachycardia, Atrial Fibrillation
-Nitroglycerin | Angina, Heart Failure
-Isosorbide Mononitrate | Angina
-Clonidine | High Blood Pressure, ADHD
-Methyldopa | High Blood Pressure in Pregnancy
-Hydralazine | High Blood Pressure, Heart Failure
-Sotalol | Atrial Fibrillation, Ventricular Arrhythmia
-Dabigatran | Atrial Fibrillation, Deep Vein Thrombosis
-Rivaroxaban | Blood Clots, Stroke Prevention
-Apixaban | Atrial Fibrillation, DVT Prophylaxis
-Enoxaparin | Deep Vein Thrombosis, Pulmonary Embolism
-Heparin | Blood Clots, Surgery Prophylaxis
-Acetazolamide | Glaucoma, Altitude Sickness, Edema
-Latanoprost | Glaucoma, Ocular Hypertension
-Timolol | Glaucoma, High Eye Pressure
-Brimonidine | Glaucoma, Rosacea
-Dorzolamide | Glaucoma
-Prednisolone | Inflammation, Allergies, Asthma, Eye Inflammation
-Dexamethasone | Inflammation, Allergic Conditions, Cerebral Edema
-Fluticasone | Asthma, Allergic Rhinitis, Nasal Polyps
-Budesonide | Asthma, Crohn's Disease, Ulcerative Colitis
-Mometasone | Allergic Rhinitis, Asthma, Skin Inflammation
-Triamcinolone | Arthritis, Allergic Reactions, Skin Conditions
-Betamethasone | Skin Inflammation, Psoriasis, Eczema
-Hydrocortisone | Skin Irritation, Allergic Reactions, Inflammation
-Tacrolimus | Eczema, Organ Transplant Rejection
-Pimecrolimus | Eczema
-Cyclosporine | Psoriasis, Rheumatoid Arthritis, Organ Rejection
-Azathioprine | Autoimmune Diseases, Organ Transplant
-Mycophenolate | Organ Rejection, Lupus Nephritis
-Leflunomide | Rheumatoid Arthritis
-Sulfasalazine | Ulcerative Colitis, Rheumatoid Arthritis
-Mesalamine | Ulcerative Colitis, Crohn's Disease
-Balsalazide | Ulcerative Colitis
-Loperamide | Diarrhea
-Bismuth Subsalicylate | Diarrhea, Indigestion, Nausea
-Psyllium | Constipation, Fiber Supplement
-Lactulose | Constipation, Hepatic Encephalopathy
-Senna | Constipation
-Oxycodone | Severe Pain
-Morphine | Severe Pain, Palliative Care
-Fentanyl | Severe Chronic Pain, Anesthesia
-Hydrocodone | Severe Pain, Cough Suppression
-Codeine | Mild to Moderate Pain, Cough
-Dextromethorphan | Dry Cough
-Guaifenesin | Chest Congestion, Wet Cough
-Benadryl | Allergies, Insomnia, Motion Sickness
-Meclizine | Motion Sickness, Vertigo, Vomiting
-Dimenhydrinate | Motion Sickness, Nausea
-Scopolamine | Nausea, Motion Sickness
-Promethazine | Nausea, Allergies, Sedation
-Epinephrine | Anaphylaxis, Severe Allergic Reaction
-Salbutamol | Asthma, Exercise-Induced Bronchospasm
-Ipratropium | COPD, Asthma
-Tiotropium | COPD, Chronic Bronchitis
-Aclidinium | COPD
-Umeclidinium | COPD
-Vilanterol | COPD, Asthma
-Formoterol | Asthma, COPD
-Salmeterol | Asthma, COPD
-Budesonide/Formoterol | Asthma, COPD
-Fluticasone/Salmeterol | Asthma, COPD
-Insulin Aspart | Diabetes Type 1 & 2
-Insulin Detemir | Diabetes
-Liraglutide | Type 2 Diabetes, Obesity
-Semaglutide | Type 2 Diabetes, Weight Management
-Dulaglutide | Type 2 Diabetes
-Empagliflozin | Type 2 Diabetes, Heart Failure
-Dapagliflozin | Type 2 Diabetes, CKD
-Canagliflozin | Type 2 Diabetes
-Sitagliptin | Type 2 Diabetes
-Linagliptin | Type 2 Diabetes
-Pioglitazone | Type 2 Diabetes
-Glimepiride | Type 2 Diabetes
-Glipizide | Type 2 Diabetes
-Glyburide | Type 2 Diabetes
-Acarbose | Type 2 Diabetes
-Repaglinide | Type 2 Diabetes
-Nateglinide | Type 2 Diabetes
-Pramlintide | Type 1 Diabetes, Type 2 Diabetes
-Estradiol | Menopause Symptoms, Osteoporosis Prevention
-Progesterone | Hormone Replacement, Amenorrhea
-Testosterone | Hypogonadism, Low Testosterone
-Sildenafil (Women) | PAH
-Tadalafil (Daily) | BPH, Erectile Dysfunction
-Vardenafil | Erectile Dysfunction
-Avanafil | Erectile Dysfunction
-Alprostadil | Erectile Dysfunction, PDA in Newborns
-Oxybutynin | Overactive Bladder
-Solifenacin | Overactive Bladder, Urinary Incontinence
-Mirabegron | Overactive Bladder
-Tolterodine | Overactive Bladder
-Fesoterodine | Overactive Bladder
-Bethanechol | Urinary Retention
-Nitrofurantoin | Urinary Tract Infection
-Trimethoprim | UTI, Bacterial Infections
-Cephalexin | Bacterial Infections, Skin Infections
-Cefdinir | Pneumonia, Sinusitis, Otitis Media
-Ceftriaxone | Meningitis, Gonorrhea, Surgical Prophylaxis
-Vancomycin | MRSA, Serious Bacterial Infections
-Clindamycin | Acne, Dental Infections, Vaginal Infections
-Erythromycin | Acne, Respiratory Infections
-Azelaic Acid | Acne, Rosacea
-Tretinoin | Acne, Skin Aging
-Adapalene | Acne
-Benzoyl Peroxide | Acne
-Clotrimazole | Fungal Infections, Yeast Infection
-Miconazole | Vaginal Yeast Infection, Athlete's Foot
-Terbinafine | Fungal Nail Infection, Ringworm
-Fluconazole | Vaginal Yeast Infection, Candidiasis
-Ketoconazole | Dandruff, Fungal Infections
-Acyclovir | Herpes, Chickenpox, Shingles
-Valacyclovir | Herpes Zoster, Genital Herpes
-Famciclovir | Herpes, Shingles
-Oseltamivir | Influenza, Flu
-Zanamivir | Influenza
-Remdesivir | COVID-19, Ebola (investigational)
-Hydroxychloroquine (COVID) | Historical use
-Ivermectin | Parasitic Infections, Rosacea, Scabies
-Albendazole | Worm Infections, Neurocysticercosis
-Mebendazole | Pinworm, Roundworm
-Praziquantel | Tapeworm, Schistosomiasis
-Artemether/Lumefantrine | Malaria
-Quinine | Malaria, Leg Cramps
-Chloroquine | Malaria, Amebiasis
-Atovaquone/Proguanil | Malaria Prevention
-Metformin+Glipizide | Type 2 Diabetes
-Losartan+HCTZ | High Blood Pressure
-Amlodipine+Benazepril | High Blood Pressure
-Ezetimibe | High Cholesterol
-Niacin | Cholesterol, Pellagra
-Fenofibrate | High Triglycerides, Cholesterol
-Gemfibrozil | High Triglycerides
-Omega-3 Fatty Acids | Hypertriglyceridemia
-Evolocumab | High Cholesterol (PCSK9 inhibitor)
-Alirocumab | High Cholesterol
-Bempedoic Acid | High Cholesterol
-Colchicine | Gout, Familial Mediterranean Fever
-Allopurinol | Gout, Kidney Stones
-Febuxostat | Gout
-Probenecid | Gout, Antibiotic Potentiation
-Sulfamethoxazole/Trimethoprim | UTI, Pneumocystis Pneumonia
-Dapsone | Leprosy, Dermatitis Herpetiformis
-Isoniazid | Tuberculosis
-Rifampin | Tuberculosis, MRSA
-Ethambutol | Tuberculosis
-Pyrazinamide | Tuberculosis
-Levofloxacin | Pneumonia, Sinusitis, Anthrax
-Moxifloxacin | Respiratory Infections, Conjunctivitis
-Tigecycline | Complicated Skin Infections
-Linezolid | VRE, MRSA Pneumonia
-Daptomycin | Complicated Skin Infections, Bacteremia
-Caspofungin | Fungal Infections, Candidemia
-Amphotericin B | Severe Fungal Infections
-Voriconazole | Aspergillosis, Candidiasis
-Posaconazole | Fungal Prophylaxis
-Itraconazole | Fungal Nail, Blastomycosis
-Ibugesic | headaches, migraines, dental pain, menstruation cramps, muscle aches, stiffness
-Penicillin | severe sore throat, fever, ear pain, painful skin lesions, unexpected breathlessness
-Crocin | fever, mild-to-moderate pain, discomfort, headaches, toothaches, muscle aches, backaches, sore throats
-Spinraza | spinal muscular atrophy (SMA)
-Zynteglo | thalassemia (beta-thalassemia) who require regular red blood cell (RBC) transfusions
-Vonjo | enlarged spleen, pain under the left ribs, early fullness, fatigue, night sweats 
-Ztalmy | epileptic seizures
-antacids | heartburn, acid indigestion, sour stomach
-dolo | fever, headaches, toothaches, menstrual cramps, muscle aches, arthritis, common cold 
-hajmola | Digestion, also taken for taste
-vicks | Cough tablet
-youtube | Boredom
-trip | depression, stress, lonliness
-Domperidone | Vomiting, Nausea
-Ciplox DT | Treating Bacetrial Infection
+</footer>
 
 
+<script>
 
-`; 
-      // --------------------------------------------------------------
+/*
+==============================================================
+ MEDIFIND SMART SEARCH
+==============================================================
 
-      // Parse the database into a usable object
-      const medicineMap = new Map();
+DATA SOURCES:
 
-      function parseMedicineDB() {
-        const lines = medicineDB.split('\n').map(line => line.trim()).filter(line => line.length > 0 && line.includes('|'));
-        for (const line of lines) {
-          const parts = line.split('|');
-          if (parts.length >= 2) {
-            const medicineName = parts[0].trim().toLowerCase();
-            const diseasesRaw = parts[1].trim();
-            // Split diseases by comma and clean
-            const diseases = diseasesRaw.split(',').map(d => d.trim()).filter(d => d.length > 0);
-            if (medicineName && diseases.length > 0) {
-              // If medicine already exists, merge diseases (avoid duplicates)
-              if (medicineMap.has(medicineName)) {
-                const existing = medicineMap.get(medicineName);
-                const combined = new Set([...existing, ...diseases]);
-                medicineMap.set(medicineName, Array.from(combined));
-              } else {
-                medicineMap.set(medicineName, diseases);
-              }
+1. NIH RxNorm
+   - medicine terminology
+   - approximate/fuzzy medicine matching
+
+2. OpenFDA
+   - medicine labeling
+   - indications and uses
+
+IMPORTANT:
+FDA does not contain Indian retail prices.
+
+Therefore this version never invents a medicine price.
+==============================================================
+*/
+
+
+const FDA_API =
+    "https://api.fda.gov/drug/label.json";
+
+
+const RX_API =
+    "https://rxnav.nlm.nih.gov/REST";
+
+
+/*
+==============================================================
+COMMON INDIAN BRAND → GENERIC FALLBACKS
+
+This helps with brands which may not exist in FDA.
+==============================================================
+*/
+
+const brandDatabase = {
+
+    "dolo": {
+        brand: "Dolo",
+        generic: "Paracetamol",
+        aliases: [
+            "dolo",
+            "dollo",
+            "dolo 650",
+            "dolo650",
+            "dolo-650"
+        ]
+    },
+
+    "crocin": {
+        brand: "Crocin",
+        generic: "Paracetamol",
+        aliases: [
+            "crocin",
+            "crocin 500",
+            "crocin 650"
+        ]
+    },
+
+    "calpol": {
+        brand: "Calpol",
+        generic: "Paracetamol",
+        aliases: [
+            "calpol",
+            "calpol 500",
+            "calpol 650"
+        ]
+    },
+
+    "combiflam": {
+        brand: "Combiflam",
+        generic: "Ibuprofen + Paracetamol",
+        aliases: [
+            "combiflam",
+            "combi flam"
+        ]
+    },
+
+    "augmentin": {
+        brand: "Augmentin",
+        generic: "Amoxicillin + Clavulanic Acid",
+        aliases: [
+            "augmentin",
+            "augmentin 625"
+        ]
+    },
+
+    "azithral": {
+        brand: "Azithral",
+        generic: "Azithromycin",
+        aliases: [
+            "azithral",
+            "azithral 500"
+        ]
+    },
+
+    "zifi": {
+        brand: "Zifi",
+        generic: "Cefixime",
+        aliases: [
+            "zifi",
+            "zifi 200"
+        ]
+    }
+
+};
+
+
+/*
+==============================================================
+NORMALIZE
+==============================================================
+*/
+
+function normalize(text) {
+
+    return text
+        .toLowerCase()
+        .trim()
+        .replace(/[-_]/g, " ")
+        .replace(/\s+/g, " ");
+
+}
+
+
+/*
+==============================================================
+LEVENSHTEIN DISTANCE
+
+Used for typo correction.
+
+Example:
+
+dollo
+dolo
+
+distance = 1
+==============================================================
+*/
+
+function levenshtein(a, b) {
+
+    const matrix = [];
+
+    for (let i = 0; i <= b.length; i++) {
+        matrix[i] = [i];
+    }
+
+    for (let j = 0; j <= a.length; j++) {
+        matrix[0][j] = j;
+    }
+
+    for (let i = 1; i <= b.length; i++) {
+
+        for (let j = 1; j <= a.length; j++) {
+
+            if (b.charAt(i - 1) === a.charAt(j - 1)) {
+
+                matrix[i][j] =
+                    matrix[i - 1][j - 1];
+
+            } else {
+
+                matrix[i][j] =
+                    Math.min(
+                        matrix[i - 1][j - 1] + 1,
+                        matrix[i][j - 1] + 1,
+                        matrix[i - 1][j] + 1
+                    );
+
             }
-          }
-        }
-      }
 
-      // Run parsing immediately
-      parseMedicineDB();
-
-      // DOM elements
-      const medicineInput = document.getElementById('medicineInput');
-      const searchBtn = document.getElementById('searchBtn');
-      const clearResultBtn = document.getElementById('clearResultBtn');
-      const resultContainer = document.getElementById('resultContainer');
-      const dynamicContent = document.getElementById('dynamicContent');
-      const welcomeMessage = document.getElementById('welcomeMessage');
-      const apiSourceText = document.getElementById('apiSourceText');
-
-      function showLoader() {
-        dynamicContent.innerHTML = `
-          <div class="loader">
-            <i class="fas fa-spinner fa-pulse"></i> Searching local medicine database...
-          </div>
-        `;
-        resultContainer.classList.remove('hidden');
-        welcomeMessage.classList.add('hidden');
-      }
-
-      function showError(message) {
-        dynamicContent.innerHTML = `
-          <div class="error-message">
-            <i class="fas fa-exclamation-circle"></i> ${message}
-          </div>
-        `;
-        resultContainer.classList.remove('hidden');
-        welcomeMessage.classList.add('hidden');
-      }
-
-      function renderMedicineInfo(medicineName, diseases) {
-        const displayName = medicineName.charAt(0).toUpperCase() + medicineName.slice(1);
-        const diseasesHtml = diseases.map(d => `<span class="disease-tag"><i class="fas fa-notes-medical"></i> ${d}</span>`).join('');
-
-        dynamicContent.innerHTML = `
-          <div class="medicine-header">
-            <span class="medicine-name"><i class="fas fa-pills" style="margin-right: 0.3rem;"></i>${displayName}</span>
-            <span class="badge"><i class="far fa-check-circle"></i> ${diseases.length} indication(s)</span>
-          </div>
-          <div class="symptoms-box">
-            <div class="symptoms-label">
-              <i class="fas fa-clipboard-list"></i> Symptoms / Diseases (Indications)
-            </div>
-            <div class="disease-list">
-              ${diseasesHtml}
-            </div>
-          </div>
-          <div class="info-text">
-            <i class="fas fa-check-circle" style="color: #0f6b82;"></i> Coded by: <br> ©Paritosh Pandey <br> Data base created by: <br> ©Aviral Pandey
-          </div>
-        `;
-        resultContainer.classList.remove('hidden');
-        welcomeMessage.classList.add('hidden');
-      }
-
-      function handleSearch() {
-        const query = medicineInput.value.trim();
-        if (!query) {
-          showError('Please enter a medicine name.');
-          return;
         }
 
-        const queryLower = query.toLowerCase();
-        
-        // Search in map - exact match first, then partial
-        if (medicineMap.has(queryLower)) {
-          renderMedicineInfo(queryLower, medicineMap.get(queryLower));
-          apiSourceText.innerHTML = 'Local database · matched';
-          return;
+    }
+
+    return matrix[b.length][a.length];
+
+}
+
+
+/*
+==============================================================
+FIND BRAND WITH TYPO CORRECTION
+==============================================================
+*/
+
+function findLocalBrand(query) {
+
+    const q = normalize(query);
+
+    let best = null;
+    let bestDistance = Infinity;
+
+    for (const key in brandDatabase) {
+
+        const medicine =
+            brandDatabase[key];
+
+        for (const alias of medicine.aliases) {
+
+            const normalizedAlias =
+                normalize(alias);
+
+            if (
+                q === normalizedAlias ||
+                q.includes(normalizedAlias) ||
+                normalizedAlias.includes(q)
+            ) {
+
+                return medicine;
+
+            }
+
+
+            const distance =
+                levenshtein(
+                    q,
+                    normalizedAlias
+                );
+
+
+            /*
+            Allow slightly larger mistakes for
+            longer medicine names.
+            */
+
+            const allowed =
+                q.length <= 5
+                    ? 1
+                    : q.length <= 9
+                        ? 2
+                        : 3;
+
+
+            if (
+                distance <= allowed &&
+                distance < bestDistance
+            ) {
+
+                bestDistance = distance;
+                best = medicine;
+
+            }
+
         }
 
-        // Partial search: find all medicines that include the query
-        const matches = [];
-        for (const [medName, diseases] of medicineMap.entries()) {
-          if (medName.includes(queryLower)) {
-            matches.push({ name: medName, diseases });
-          }
+    }
+
+    return best;
+
+}
+
+
+/*
+==============================================================
+RXNORM APPROXIMATE SEARCH
+==============================================================
+*/
+
+async function rxNormSearch(query) {
+
+    try {
+
+        const url =
+            RX_API +
+            "/approximateTerm.json?term=" +
+            encodeURIComponent(query) +
+            "&maxEntries=5";
+
+
+        const response =
+            await fetch(url);
+
+
+        if (!response.ok) {
+            return null;
         }
 
-        if (matches.length === 0) {
-          showError(`No medicine found matching "${query}". Try another name or check spelling.`);
-          apiSourceText.innerHTML = 'Local database · not found';
-          return;
+
+        const data =
+            await response.json();
+
+
+        const candidates =
+            data
+                ?.approximateGroup
+                ?.candidate;
+
+
+        if (
+            !candidates ||
+            !candidates.length
+        ) {
+
+            return null;
+
         }
 
-        if (matches.length === 1) {
-          renderMedicineInfo(matches[0].name, matches[0].diseases);
-          apiSourceText.innerHTML = 'Local database · 1 match';
-          return;
+
+        /*
+        Pick the closest result.
+        */
+
+        candidates.sort(
+            (a, b) =>
+                Number(b.score || 0) -
+                Number(a.score || 0)
+        );
+
+
+        return candidates[0];
+
+    } catch (error) {
+
+        console.log(
+            "RxNorm unavailable:",
+            error
+        );
+
+        return null;
+
+    }
+
+}
+
+
+/*
+==============================================================
+FDA SEARCH
+==============================================================
+*/
+
+async function fdaSearch(term) {
+
+    const searches = [
+
+        `openfda.generic_name:"${term}"`,
+
+        `openfda.brand_name:"${term}"`,
+
+        `openfda.substance_name:"${term}"`,
+
+        `active_ingredient:"${term}"`
+
+    ];
+
+
+    for (const search of searches) {
+
+        try {
+
+            const url =
+                FDA_API +
+                "?search=" +
+                encodeURIComponent(search) +
+                "&limit=1";
+
+
+            const response =
+                await fetch(url);
+
+
+            if (!response.ok) {
+                continue;
+            }
+
+
+            const data =
+                await response.json();
+
+
+            if (
+                data.results &&
+                data.results.length
+            ) {
+
+                return data.results[0];
+
+            }
+
+        } catch (error) {
+
+            console.log(
+                "FDA query failed:",
+                search
+            );
+
         }
 
-        // Multiple matches: show summary with clickable suggestions? For simplicity show first match with note
-        // But better UX: display the first match and mention others
-        const firstMatch = matches[0];
-        const otherNames = matches.slice(1).map(m => m.name.charAt(0).toUpperCase() + m.name.slice(1)).join(', ');
-        
-        renderMedicineInfo(firstMatch.name, firstMatch.diseases);
-        dynamicContent.innerHTML += `
-          <div class="info-text" style="margin-top:0.8rem; background:#e6f3f8; padding:0.5rem 1rem; border-radius:1rem;">
-            <i class="fas fa-search"></i> Also found similar: ${otherNames}. Refine search for exact match.
-          </div>
-        `;
-        apiSourceText.innerHTML = `Local database · ${matches.length} matches`;
-      }
+    }
 
-      function clearResults() {
-        resultContainer.classList.add('hidden');
-        welcomeMessage.classList.remove('hidden');
-        medicineInput.value = '';
-        apiSourceText.innerHTML = 'Local database · 250+ entries';
-      }
+    return null;
 
-      // Event listeners
-      searchBtn.addEventListener('click', handleSearch);
-      medicineInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          handleSearch();
+}
+
+
+/*
+==============================================================
+HANDLE ENTER
+==============================================================
+*/
+
+function handleEnter(event) {
+
+    if (event.key === "Enter") {
+        searchMedicine();
+    }
+
+}
+
+
+/*
+==============================================================
+QUICK SEARCH
+==============================================================
+*/
+
+function quickSearch(name) {
+
+    document.getElementById(
+        "medicineInput"
+    ).value = name;
+
+    searchMedicine();
+
+}
+
+
+/*
+==============================================================
+SHOW ERROR
+==============================================================
+*/
+
+function showError(message) {
+
+    const box =
+        document.getElementById("error");
+
+    box.innerText =
+        "⚠️ " + message;
+
+    box.style.display =
+        "block";
+
+}
+
+
+/*
+==============================================================
+HIDE ERROR
+==============================================================
+*/
+
+function hideError() {
+
+    document.getElementById(
+        "error"
+    ).style.display = "none";
+
+}
+
+
+/*
+==============================================================
+SHOW SUGGESTION
+==============================================================
+*/
+
+function showSuggestion(
+    original,
+    corrected
+) {
+
+    const box =
+        document.getElementById(
+            "suggestion"
+        );
+
+
+    box.innerHTML =
+        `Did you mean <strong onclick="useSuggestion('${corrected.replace(/'/g, "\\'")}')">${corrected}</strong>?`;
+
+
+    box.style.display =
+        "block";
+
+}
+
+
+/*
+==============================================================
+HIDE SUGGESTION
+==============================================================
+*/
+
+function hideSuggestion() {
+
+    document.getElementById(
+        "suggestion"
+    ).style.display = "none";
+
+}
+
+
+/*
+==============================================================
+USE SUGGESTION
+==============================================================
+*/
+
+function useSuggestion(name) {
+
+    document.getElementById(
+        "medicineInput"
+    ).value = name;
+
+    searchMedicine();
+
+}
+
+
+/*
+==============================================================
+FIRST VALUE
+==============================================================
+*/
+
+function first(value) {
+
+    if (!value) {
+        return "";
+    }
+
+    if (Array.isArray(value)) {
+        return value[0] || "";
+    }
+
+    return value;
+
+}
+
+
+/*
+==============================================================
+SEARCH MEDICINE
+==============================================================
+*/
+
+async function searchMedicine() {
+
+    const input =
+        document.getElementById(
+            "medicineInput"
+        );
+
+    const button =
+        document.getElementById(
+            "searchButton"
+        );
+
+    const query =
+        input.value.trim();
+
+
+    if (!query) {
+
+        showError(
+            "Please enter a medicine name."
+        );
+
+        return;
+
+    }
+
+
+    hideError();
+    hideSuggestion();
+
+
+    document.getElementById(
+        "result"
+    ).style.display = "none";
+
+
+    document.getElementById(
+        "loading"
+    ).style.display = "block";
+
+
+    button.disabled = true;
+
+
+    try {
+
+        /*
+        ======================================================
+        STEP 1
+        Check Indian brand fallback database
+        ======================================================
+        */
+
+        const localBrand =
+            findLocalBrand(query);
+
+
+        let medicineBrand = null;
+        let genericName = null;
+
+
+        if (localBrand) {
+
+            medicineBrand =
+                localBrand.brand;
+
+            genericName =
+                localBrand.generic;
+
+
+            /*
+            If typo was detected,
+            show correction.
+            */
+
+            if (
+                normalize(query) !==
+                normalize(localBrand.brand)
+            ) {
+
+                showSuggestion(
+                    query,
+                    localBrand.brand
+                );
+
+            }
+
         }
-      });
 
-      clearResultBtn.addEventListener('click', clearResults);
 
-      // Initial state
-      window.addEventListener('load', () => {
-        resultContainer.classList.add('hidden');
-        welcomeMessage.classList.remove('hidden');
-      });
+        /*
+        ======================================================
+        STEP 2
+        Search RxNorm for unknown names
+        ======================================================
+        */
 
-    })();
-  </script>
+        if (!genericName) {
+
+            const rxResult =
+                await rxNormSearch(query);
+
+
+            if (rxResult) {
+
+                genericName =
+                    rxResult.name;
+
+            }
+
+        }
+
+
+        /*
+        ======================================================
+        STEP 3
+        Search FDA
+        ======================================================
+        */
+
+        let fdaDrug =
+            await fdaSearch(
+                genericName || query
+            );
+
+
+        /*
+        If generic contains combination
+        medicine, try individual terms.
+        */
+
+        if (
+            !fdaDrug &&
+            genericName &&
+            genericName.includes("+")
+        ) {
+
+            const parts =
+                genericName.split("+");
+
+
+            for (const part of parts) {
+
+                fdaDrug =
+                    await fdaSearch(
+                        part.trim()
+                    );
+
+
+                if (fdaDrug) {
+                    break;
+                }
+
+            }
+
+        }
+
+
+        /*
+        ======================================================
+        SPECIAL DIRECTION FOR DOLO / PARACETAMOL
+        ======================================================
+        */
+
+        if (
+            localBrand &&
+            normalize(localBrand.brand) === "dolo" &&
+            !fdaDrug
+        ) {
+
+            fdaDrug =
+                await fdaSearch(
+                    "acetaminophen"
+                );
+
+        }
+
+
+        /*
+        ======================================================
+        NOTHING FOUND
+        ======================================================
+        */
+
+        if (
+            !fdaDrug &&
+            !genericName
+        ) {
+
+            throw new Error(
+                "Medicine not found. Try the generic name or check the spelling."
+            );
+
+        }
+
+
+        /*
+        ======================================================
+        EXTRACT FDA DATA
+        ======================================================
+        */
+
+        const openfda =
+            fdaDrug?.openfda || {};
+
+
+        const fdaGeneric =
+            first(
+                openfda.generic_name
+            );
+
+
+        const fdaBrand =
+            first(
+                openfda.brand_name
+            );
+
+
+        /*
+        ======================================================
+        FINAL NAME
+        ======================================================
+        */
+
+        const finalBrand =
+            medicineBrand ||
+            fdaBrand ||
+            query;
+
+
+        const finalGeneric =
+            genericName ||
+            fdaGeneric ||
+            query;
+
+
+        document.getElementById(
+            "medicineName"
+        ).innerText =
+            finalBrand;
+
+
+        document.getElementById(
+            "genericName"
+        ).innerText =
+            "Generic medicine: " +
+            finalGeneric;
+
+
+        /*
+        ======================================================
+        USES
+        ======================================================
+        */
+
+        let uses = "";
+
+
+        if (fdaDrug) {
+
+            uses =
+                first(
+                    fdaDrug.indications_and_usage
+                ) ||
+                first(
+                    fdaDrug.uses
+                );
+
+        }
+
+
+        /*
+        For common Indian brands,
+        use a safe general fallback if FDA
+        doesn't contain the brand.
+        */
+
+        if (
+            !uses &&
+            localBrand
+        ) {
+
+            const generic =
+                normalize(
+                    localBrand.generic
+                );
+
+
+            if (
+                generic.includes(
+                    "paracetamol"
+                )
+            ) {
+
+                uses =
+                    "Commonly used for temporary relief of fever and mild-to-moderate pain.";
+
+            }
+
+            else if (
+                generic.includes(
+                    "ibuprofen"
+                )
+            ) {
+
+                uses =
+                    "Commonly used for temporary relief of pain, fever, and inflammation.";
+
+            }
+
+            else if (
+                generic.includes(
+                    "amoxicillin"
+                )
+            ) {
+
+                uses =
+                    "An antibiotic used to treat certain bacterial infections.";
+
+            }
+
+            else if (
+                generic.includes(
+                    "azithromycin"
+                )
+            ) {
+
+                uses =
+                    "An antibiotic used to treat certain bacterial infections.";
+
+            }
+
+            else if (
+                generic.includes(
+                    "cefixime"
+                )
+            ) {
+
+                uses =
+                    "An antibiotic used to treat certain bacterial infections.";
+
+            }
+
+        }
+
+
+        if (!uses) {
+
+            uses =
+                "Information about the common uses of this medicine was not available from the retrieved public database.";
+
+        }
+
+
+        document.getElementById(
+            "uses"
+        ).innerText =
+            uses;
+
+
+        /*
+        ======================================================
+        PRICE
+
+        Do NOT invent a number.
+        ======================================================
+        */
+
+        document.getElementById(
+            "price"
+        ).innerText =
+            "Unavailable";
+
+
+        document.getElementById(
+            "priceNote"
+        ).innerText =
+            "Indian retail price data is not provided by FDA/RxNorm. A verified Indian price API would be required to show a real average price.";
+
+
+        /*
+        ======================================================
+        SHOW
+        ======================================================
+        */
+
+        document.getElementById(
+            "result"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "result"
+        ).scrollIntoView({
+            behavior: "smooth"
+        });
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        showError(
+            error.message ||
+            "Unable to find this medicine."
+        );
+
+    } finally {
+
+        document.getElementById(
+            "loading"
+        ).style.display =
+            "none";
+
+
+        button.disabled =
+            false;
+
+    }
+
+}
+
+</script>
+
 </body>
 </html>
