@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MovieBox: Stream from your terminal</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0d1f;--bg2:#12102b;--fg:#f1ecff;--mut:#a7a3c7;--line:#2c2860;
+  --violet:#c9a0ff;--pink:#ff6ec7;--cyan:#5ee7ff;--lime:#b8f26b;--amber:#ffb627;
+  --d1:"Fraunces",Georgia,serif;--d2:"Bebas Neue",Impact,sans-serif;--px:"Press Start 2P",ui-monospace,monospace;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;--body:"Space Grotesk",system-ui,sans-serif;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f6f1ff;--bg2:#ebe3fb;--fg:#1b1540;--mut:#5d5883;--line:#d4c9f0;--violet:#6b34c9;--pink:#c21f86;--cyan:#087a96;--lime:#3f7d00;--amber:#a85f00}}
+:root[data-theme="dark"]{--bg:#0a0d1f;--bg2:#12102b;--fg:#f1ecff;--mut:#a7a3c7;--line:#2c2860}
+html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.6 var(--body);overflow-x:hidden}
+nav{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:calc(12px + env(safe-area-inset-top,0px)) 24px 12px;background:color-mix(in srgb,var(--bg) 80%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav b{font:.75rem var(--px);color:var(--violet);text-shadow:2px 2px 0 var(--pink)}
+nav .links{display:flex;gap:22px;font-size:.92rem;color:var(--mut)}
+nav .links a{text-decoration:none;color:var(--mut)}nav .links a:hover{color:var(--cyan)}
+@media(max-width:640px){nav .links a:nth-child(n+3){display:none}}
+.hero{height:230vh;position:relative}
+.stick{position:sticky;top:0;height:100vh;height:100svh;display:grid;place-items:center;overflow:hidden}
+.beam{position:absolute;left:50%;top:-10%;width:140vmax;height:140vmax;transform:translateX(-50%) rotate(var(--rot,0deg));background:conic-gradient(from 160deg at 50% 0%,transparent 0 6%,color-mix(in srgb,var(--pink) 26%,transparent) 9%,color-mix(in srgb,var(--cyan) 22%,transparent) 14%,transparent 20% 100%);pointer-events:none;opacity:var(--bo,1)}
+.hero h1{font:clamp(2.2rem,10.5vw,7.4rem)/1.1 var(--px);margin:0;text-align:center;color:var(--violet);text-shadow:.05em .05em 0 var(--pink),.1em .1em 0 var(--cyan);transform:scale(var(--s,1));opacity:var(--o,1);will-change:transform}
+.hero p{max-width:30ch;text-align:center;margin:34px auto 0;font:italic 600 clamp(1.3rem,3.5vw,1.9rem)/1.3 var(--d1);color:var(--fg);opacity:var(--o,1)}
+.hero .in{padding:0 20px;transform:translateY(var(--y,0px))}
+.hint{position:absolute;bottom:calc(28px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);color:var(--lime);font:.8rem var(--mono);opacity:var(--o,1)}
+.hint i{display:block;width:1px;height:34px;margin:8px auto 0;background:linear-gradient(var(--lime),transparent);animation:drip 1.8s infinite}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+.term-wrap{height:380vh;position:relative}
+.term-wrap .stick{background:radial-gradient(ellipse at 20% 0%,color-mix(in srgb,var(--violet) 18%,transparent),transparent 60%),radial-gradient(ellipse at 90% 100%,color-mix(in srgb,var(--cyan) 14%,transparent),transparent 55%),var(--bg2);border-block:1px solid var(--line)}
+.term-in{width:min(900px,94vw)}
+.term-in h2{font:clamp(2rem,6vw,3.6rem)/1 var(--d2);letter-spacing:.02em;margin:0 0 6px;color:var(--cyan)}
+.term-in>p{color:var(--mut);margin:0 0 14px;max-width:56ch;font-size:.98rem}
+.tabs{display:flex;gap:8px;margin-bottom:10px}
+.tabs span{padding:4px 14px;border:1px solid var(--line);border-radius:99px;font:.8rem var(--mono);color:var(--mut);transition:.3s}
+.tabs span.on{color:#10102a;background:var(--lime);border-color:var(--lime)}
+.term{background:#05060f;color:#e5e1ff;border:1px solid var(--line);border-radius:10px;padding:14px 16px;font:14px/1.6 var(--mono);height:min(420px,56vh);overflow:hidden;white-space:pre;position:relative;box-shadow:0 20px 60px -20px color-mix(in srgb,var(--violet) 50%,transparent)}
+.term .p{color:var(--amber)}.term .d{color:#8f8bb5}.term .g{color:var(--lime)}
+.cur{display:inline-block;width:8px;height:1.05em;background:var(--amber);vertical-align:text-bottom;animation:bl 1s steps(2) infinite}
+@keyframes bl{50%{opacity:0}}
+.bar{height:3px;background:var(--line);margin-top:14px;border-radius:2px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--cyan),var(--lime))}
+/* TUI */
+.tui{position:absolute;inset:0;padding:12px 14px;display:flex;flex-direction:column;align-items:center;gap:8px;background:#05060f;white-space:normal}
+.tui .logo{font:clamp(1.1rem,5.4vw,2.7rem)/1.2 var(--px);color:var(--violet);text-shadow:.06em .06em 0 var(--pink),.12em .12em 0 #3b2a7a;margin-top:6px}
+.tui .ver{font:.65rem var(--mono);color:#8f8bb5;align-self:flex-end}
+.tui .search{width:min(560px,100%);border:1px solid var(--violet);border-radius:4px;padding:5px 10px;display:flex;justify-content:space-between;gap:10px;font:.78rem var(--mono);color:#8f8bb5}
+.tui .search b{color:var(--cyan);font-weight:400;white-space:nowrap}
+.tui .grid{width:min(560px,100%);display:grid;grid-template-columns:1fr 1fr;gap:10px;border:1px solid var(--pink);border-radius:4px;padding:10px;font:.76rem/1.9 var(--mono)}
+.tui .grid h4{margin:0 0 2px;font:700 .76rem var(--mono);color:var(--pink)}
+.tui li{list-style:none;padding:0 6px;color:#cfcbf0;border-radius:2px;transition:.15s}
+.tui ul{margin:0;padding:0}
+.tui li.sel{background:var(--cyan);color:#05060f;font-weight:700}
+.tui li.sel::before{content:"▸ "}
+.tui .r li{color:#8f8bb5}.tui .r li.sel{background:none;color:var(--lime);font-weight:400}.tui .r li.sel::before{content:""}
+.tui .status{width:min(560px,100%);font:.76rem var(--mono);color:var(--lime);min-height:1.4em}
+.tui .keys{margin-top:auto;font:.7rem var(--mono);color:#8f8bb5;align-self:flex-start}
+@media(max-width:520px){.tui .grid{grid-template-columns:1fr}.tui .r{display:none}}
+section.f{padding:clamp(80px,14vh,150px) 24px;position:relative}
+.row{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,6vw,80px);align-items:center}
+.row.rev .txt{order:2}
+@media(max-width:760px){.row{grid-template-columns:1fr}.row.rev .txt{order:0}}
+.row h2{font:600 clamp(2.1rem,6vw,3.8rem)/1.02 var(--d1);margin:0 0 14px;letter-spacing:-.02em}
+#vlc h2{color:var(--amber)}#srt h2{color:var(--pink)}#tv h2{color:var(--lime)}
+.row p{color:var(--mut);margin:0;max-width:44ch}
+.art{border:1px solid var(--line);border-radius:14px;aspect-ratio:4/3;display:grid;place-items:center;overflow:hidden;position:relative}
+#vlc .art{background:linear-gradient(135deg,color-mix(in srgb,var(--amber) 22%,var(--bg2)),var(--bg2))}
+#srt .art{background:linear-gradient(135deg,color-mix(in srgb,var(--pink) 22%,var(--bg2)),var(--bg2))}
+#tv .art{background:linear-gradient(135deg,color-mix(in srgb,var(--lime) 18%,var(--bg2)),var(--bg2))}
+.rv{opacity:0;transform:translateY(46px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+.rv.show{opacity:1;transform:none}
+.art svg{width:78%;height:auto}
+.srt{font:14px/1.7 var(--mono);padding:20px;width:100%}
+.srt span{display:block;opacity:0;transform:translateX(-14px);transition:.6s}
+.show .srt span{opacity:1;transform:none}.show .srt span:nth-child(2){transition-delay:.15s}.show .srt span:nth-child(3){transition-delay:.3s}.show .srt span:nth-child(4){transition-delay:.45s}.show .srt span:nth-child(5){transition-delay:.6s}.show .srt span:nth-child(6){transition-delay:.75s}
+.srt em{color:var(--amber);font-style:normal}.srt i{color:var(--cyan);font-style:normal}
+.dash{stroke-dasharray:400;stroke-dashoffset:400;transition:stroke-dashoffset 1.6s ease .2s}.show .dash{stroke-dashoffset:0}
+.plat{padding:clamp(70px,12vh,130px) 24px;background:var(--bg2);border-block:1px solid var(--line);text-align:center}
+.plat h2{font:clamp(2.2rem,7vw,4.4rem)/1 var(--d2);letter-spacing:.03em;margin:0 0 30px;background:linear-gradient(90deg,var(--pink),var(--amber),var(--lime),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;max-width:760px;margin:0 auto}
+.chips span{padding:10px 20px;border:1px solid currentColor;border-radius:99px;font:500 .95rem var(--mono);transition:.3s}
+.chips span:nth-child(1){color:var(--cyan)}.chips span:nth-child(2){color:var(--violet)}.chips span:nth-child(3){color:var(--amber)}.chips span:nth-child(4){color:var(--lime)}.chips span:nth-child(5){color:var(--pink)}
+.chips span:hover{transform:translateY(-4px) rotate(-1.5deg);background:color-mix(in srgb,currentColor 14%,transparent)}
+footer{padding:80px 24px calc(60px + env(safe-area-inset-bottom,0px));text-align:center}
+footer .big{font:italic 600 clamp(1.6rem,4.5vw,2.6rem)/1.2 var(--d1);margin:0 0 14px}
+footer small{font:.8rem var(--px);color:var(--violet);line-height:2}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.rv{opacity:1;transform:none;transition:none}.hint i,.cur{animation:none}.dash{stroke-dashoffset:0;transition:none}.srt span{opacity:1;transform:none;transition:none}}
+</style>
+</head>
+<body>
+<nav>
+  <b>MOVIEBOX</b>
+  <div class="links"><a href="#how">Terminal</a><a href="#vlc">VLC</a><a href="#srt">Subtitles</a><a href="#tv">Android TV</a></div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="stick">
+    <div class="beam" id="beam"></div>
+    <div class="in" id="heroIn">
+      <h1 id="heroH">MOVIEBOX</h1>
+      <p id="heroP">Any movie, one word in your terminal. No waiting for a download.</p>
+    </div>
+    <div class="hint" id="hint">scroll<i></i></div>
+  </div>
+</header>
+
+<div class="term-wrap" id="how">
+  <div class="stick">
+    <div class="term-in">
+      <h2>Type moviebox-tui. Pick a movie. Press play.</h2>
+      <p>Works in PowerShell on Windows and Terminal on Mac.</p>
+      <div class="tabs"><span id="t1" class="on">PowerShell</span><span id="t2">macOS Terminal</span></div>
+      <div class="term" id="term" aria-live="off"></div>
+      <div class="bar"><i id="barI"></i></div>
+    </div>
+  </div>
+</div>
+
+<section class="f" id="vlc">
+  <div class="row">
+    <div class="txt rv"><h2>Stream straight into VLC</h2><p>MovieBox hands the stream to VLC while it plays. Nothing gets saved to your disk, so there is nothing to clean up afterwards.</p></div>
+    <div class="art rv">
+      <svg viewBox="0 0 200 150" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-label="Video player with play button">
+        <rect x="15" y="15" width="170" height="100" rx="8" class="dash" style="color:var(--fg)"/>
+        <path d="M85 45 L125 65 L85 85 Z" class="dash" style="color:var(--amber)"/>
+        <path d="M30 132 H170" style="color:var(--line)"/>
+        <path d="M30 132 H112" class="dash" style="color:var(--amber)"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section class="f" id="srt">
+  <div class="row rev">
+    <div class="txt rv"><h2>Subtitles come as an SRT file</h2><p>Want to keep a copy? Download the movie with its subtitles saved as a standard .srt file that works in any player.</p></div>
+    <div class="art rv"><div class="srt">
+      <span><em>1</em></span>
+      <span><i>00:00:04,200 --&gt; 00:00:06,900</i></span>
+      <span>We were never here.</span>
+      <span><em>2</em></span>
+      <span><i>00:00:07,400 --&gt; 00:00:10,100</i></span>
+      <span>Then why is the door open?</span>
+    </div></div>
+  </div>
+</section>
+
+<section class="f" id="tv">
+  <div class="row">
+    <div class="txt rv"><h2>Send it to your Android TV</h2><p>Pick your TV from the list and the movie opens on the big screen. Your laptop stays free for other things.</p></div>
+    <div class="art rv">
+      <svg viewBox="0 0 200 150" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-label="Television with signal">
+        <rect x="25" y="25" width="150" height="90" rx="6" class="dash" style="color:var(--fg)"/>
+        <path d="M80 130 H120 M100 115 V130" class="dash" style="color:var(--fg)"/>
+        <path d="M80 58 a28 28 0 0 1 40 0 M88 70 a16 16 0 0 1 24 0" class="dash" style="color:var(--lime)"/>
+        <circle cx="100" cy="82" r="3" fill="var(--lime)" stroke="none"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<div class="plat">
+  <h2 class="rv">WORKS WHERE YOU WATCH</h2>
+  <div class="chips rv"><span>Windows PowerShell</span><span>macOS Terminal</span><span>VLC media player</span><span>Android TV</span><span>.srt subtitles</span></div>
+</div>
+
+<footer>
+  <p class="big">Watch first. Download only if you want to.</p>
+  <small>Owned and Made By APT Studiosss</small>
+</footer>
+
+<script>
+(function(){
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function clamp(x){return Math.max(0,Math.min(1,x))}
+  function prog(el){var r=el.getBoundingClientRect();var t=r.height-innerHeight;return t>0?clamp(-r.top/t):0}
+  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+  var hero=document.getElementById('top'),beam=document.getElementById('beam'),hh=document.getElementById('heroH'),hp=document.getElementById('heroP'),hin=document.getElementById('heroIn'),hint=document.getElementById('hint');
+  var tw=document.getElementById('how'),term=document.getElementById('term'),t1=document.getElementById('t1'),t2=document.getElementById('t2'),barI=document.getElementById('barI');
+  var CMD='moviebox-tui',last='';
+  var CATS=['Trending Now','Top Rated Series','Latest Releases','Most Watched'];
+  var DESC=['Popular & In-Theatres','Critically Acclaimed TV','Recent UK & HD Additions','Community Favorites'];
+  function tui(sel,status){
+    var l='',r='';
+    for(var i=0;i<4;i++){l+='<li class="'+(i===sel?'sel':'')+'">'+CATS[i]+'</li>';r+='<li class="'+(i===sel?'sel':'')+'">'+DESC[i]+'</li>'}
+    return '<div class="tui"><div class="ver">v1.0</div><div class="logo">MOVIEBOX</div>'+
+      '<div class="search"><span>Search movies, series &amp; anime...</span><b>[MovieBox · Ctrl+P]</b></div>'+
+      '<div class="grid"><div><h4>Discover Categories</h4><ul>'+l+'</ul></div><div class="r"><h4>Browse</h4><ul>'+r+'</ul></div></div>'+
+      '<div class="status">'+status+'</div><div class="keys">[?] Help &nbsp; [q] Quit</div></div>';
+  }
+  function view(os,p){
+    var prompt=os?'you@macbook ~ % ':'PS C:\\Users\\you> ';
+    var typeP=clamp(p/0.25),n=Math.floor(typeP*CMD.length);
+    var head='<span class="p">'+esc(prompt)+'</span>'+esc(CMD.slice(0,n));
+    if(p<0.3)return head+'<span class="cur"></span>';
+    var q=clamp((p-0.3)/0.7),sel=Math.min(3,Math.floor(q*4.2)),st='';
+    if(q>0.85)st='Opening VLC... streaming now.';
+    else if(q>0.1)st='Press Enter to browse "'+CATS[sel]+'"';
+    return head+'\n'+tui(sel,st);
+  }
+  function frame(){
+    var p0=prog(hero);
+    if(!reduce){
+      hh.style.setProperty('--s',(1+p0*1.5).toFixed(3));
+      hin.style.setProperty('--y',(-p0*60)+'px');
+      var o=(1-clamp(p0*1.7)).toFixed(3);
+      hh.style.setProperty('--o',o);hp.style.setProperty('--o',o);hint.style.setProperty('--o',o);
+      beam.style.setProperty('--rot',(-18+p0*36)+'deg');
+      beam.style.setProperty('--bo',(0.5+p0*0.5).toFixed(2));
+    }
+    var p=prog(tw);
+    barI.style.width=(p*100)+'%';
+    var mac=p>=0.5;
+    t1.className=mac?'':'on';t2.className=mac?'on':'';
+    var lp=mac?(p-0.5)/0.5:p/0.5;
+    if(reduce)lp=0.6;
+    var h=view(mac,clamp(lp*1.05));
+    if(h!==last){term.innerHTML=h;last=h}
+  }
+  var tk=false;
+  function onS(){if(!tk){tk=true;requestAnimationFrame(function(){frame();tk=false})}}
+  addEventListener('scroll',onS,{passive:true});addEventListener('resize',onS);frame();
+  var els=document.querySelectorAll('.rv');
+  if('IntersectionObserver' in window&&!reduce){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('show');io.unobserve(e.target)}})},{threshold:.25});
+    els.forEach(function(e){io.observe(e)});
+  }else{els.forEach(function(e){e.classList.add('show')})}
+})();
+</script>
+</body>
+</html>
